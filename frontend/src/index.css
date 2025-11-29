@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #6E7E85;
+  --color-primary-dark: #1C0F13;
+  --color-primary-light: #B7CECE;
+  --color-bg-primary: #E2E2E2;
+  --color-bg-secondary: #B7CECE;
+  --color-bg-dark: #1C0F13;
+  --color-bg-card: #B7CECE;
+  --color-text-primary: #1C0F13;
+  --color-text-secondary: #6E7E85;
+  --color-text-light: #BBBAC6;
+  --color-text-white: #FFFFFF;
+  --color-success: #6E7E85;
+  --color-warning: #BBBAC6;
+  --color-error: #1C0F13;
+  --color-info: #6E7E85;
+  --color-border: #BBBAC6;
+  --color-border-light: #B7CECE;
+  --shadow-sm: 0 1px 2px 0 rgba(28, 15, 19, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(28, 15, 19, 0.15);
+  --shadow-lg: 0 10px 15px -3px rgba(28, 15, 19, 0.2);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-light);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
