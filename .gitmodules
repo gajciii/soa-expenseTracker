@@ -1,0 +1,3 @@
+[submodule "soa-expense"]
+	path = soa-expense
+	url = git@github.com:adam8kac/soa-expense.git
