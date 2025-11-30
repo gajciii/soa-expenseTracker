@@ -69,6 +69,26 @@ services:
     depends_on:
       - soa-login
 
+  soa-analytics:
+    build:
+      context: ./soa-analytics
+      dockerfile: Dockerfile
+    container_name: soa-analytics
+    ports:
+      - '8003:8003'
+    env_file:
+      - ./soa-analytics/.env
+    environment:
+      - PORT=8003
+      - CATEGORY_BUDGET_URL=http://soa-category-budget:8002
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+    restart: unless-stopped
+    networks:
+      - soa-network
+    depends_on:
+      - soa-category-budget
+      - soa-login
+
   soa-subscription:
     build:
       context: ./soa-subscription

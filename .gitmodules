@@ -10,3 +10,6 @@
 [submodule "soa-subscription"]
 	path = soa-subscription
 	url = https://github.com/anjalecnik/SOA_SubscriptionService.git
+[submodule "soa-analytics"]
+	path = soa-analytics
+	url = git@github.com:Tevc25/soa-analytics.git
