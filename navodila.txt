@@ -1,8 +1,0 @@
-Kako pridobimo vse mikrostoritve oz tega repo:
-git pull
-git submodule update --init --recursive
-git submodule foreach git pull origin main   # ali drug branch
-
-ako prvič dodaš submodule? 
-git submodule add <URL> <IME>
-git commit -m "txt"
