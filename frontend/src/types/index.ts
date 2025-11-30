@@ -119,3 +119,34 @@ export interface UpdateNotificationRequest {
   body?: string;
 }
 
+export interface CategoryRequest {
+  name: string;
+}
+
+export interface CategoryResponse {
+  category_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCategoryResponse {
+  message: string;
+  category_id: string;
+}
+
+export interface BudgetRequest {
+  month: string;
+  category_id: string;
+  limit: number;
+}
+
+export interface BudgetResponse {
+  budget_id: string;
+  month: string;
+  category_id: string;
+  limit: string;
+  created_at: string;
+  updated_at: string;
+}
+

@@ -10,6 +10,8 @@ export const Navbar = () => {
   const isExpenses = location.pathname === '/expenses';
   const isReports = location.pathname === '/reports';
   const isNotifications = location.pathname === '/notifications';
+  const isCategories = location.pathname === '/categories';
+  const isBudgets = location.pathname === '/budgets';
 
   if (!isAuthenticated) {
     return null;
@@ -46,6 +48,20 @@ export const Navbar = () => {
               style={navbarStyles.link(isNotifications)}
             >
               Notifications
+            </Link>
+            <Link
+              to="/categories"
+              className={navbarClasses.link(isCategories)}
+              style={navbarStyles.link(isCategories)}
+            >
+              Categories
+            </Link>
+            <Link
+              to="/budgets"
+              className={navbarClasses.link(isBudgets)}
+              style={navbarStyles.link(isBudgets)}
+            >
+              Budgets
             </Link>
           </div>
           <Button
