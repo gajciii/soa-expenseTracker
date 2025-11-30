@@ -7,3 +7,6 @@
 [submodule "soa-category-budget"]
 	path = soa-category-budget
 	url = git@github.com:Tevc25/soa-category-budget.git
+[submodule "soa-subscription"]
+	path = soa-subscription
+	url = https://github.com/anjalecnik/SOA_SubscriptionService.git
