@@ -11,21 +11,21 @@ export interface ExpenseRequest {
 }
 
 export interface ExpenseResponse {
-  expense_id?: string; // Optional because backend doesn't return it in GET, but we store it on frontend
+  expense_id?: string;
   description: string;
   items: Item[];
   total_price: number;
-  created_at: string; // Format: "YYYY/MM/DD HH:mm:ss"
-  updated_at: string; // Format: "YYYY/MM/DD HH:mm:ss"
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Report {
-  date_from: string | null; // Format: "YYYY-MM-DD" or null
-  date_to: string | null; // Format: "YYYY-MM-DD" or null
+  date_from: string | null;
+  date_to: string | null;
   expenses: ExpenseResponse[];
   most_expensive_items: Item[];
   total_price: number;
-  created_at: string; // Format: "YYYY/MM/DD HH:mm:ss"
+  created_at: string;
 }
 
 export interface CreateExpenseResponse {
@@ -65,5 +65,57 @@ export interface RegisterRequest {
   password: string;
   first_name?: string;
   last_name?: string;
+}
+
+export enum NotificationChannel {
+  EMAIL = 'EMAIL',
+}
+
+export interface Reminder {
+  id: number;
+  userId: string;
+  message: string;
+  remindAt: string;
+  processed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateReminderRequest {
+  userId: string;
+  message: string;
+  remindAt: string;
+}
+
+export interface UpdateReminderRequest {
+  message?: string;
+  remindAt?: string;
+  processed?: boolean;
+}
+
+export interface Notification {
+  id: number;
+  userId: string;
+  title: string;
+  body: string;
+  channel: NotificationChannel;
+  read: boolean;
+  source?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateNotificationRequest {
+  userId: string;
+  title: string;
+  body: string;
+  channel?: NotificationChannel;
+  source?: string;
+}
+
+export interface UpdateNotificationRequest {
+  read?: boolean;
+  title?: string;
+  body?: string;
 }
 

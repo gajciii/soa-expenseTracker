@@ -37,3 +37,4 @@ export const expenseItemClasses = {
   totalContent: 'text-right'
 };
 
+

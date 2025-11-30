@@ -8,4 +8,5 @@ export * from './reportStyles';
 export * from './modalStyles';
 export * from './loginPageStyles';
 export * from './registerPageStyles';
+export * from './notificationStyles';
 

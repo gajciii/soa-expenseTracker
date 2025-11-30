@@ -34,3 +34,4 @@ export const expenseListClasses = {
   itemsContainer: 'space-y-4'
 };
 
+

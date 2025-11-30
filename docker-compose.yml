@@ -1,0 +1,58 @@
+services:
+  soa-expense:
+    build:
+      context: ./soa-expense
+      dockerfile: Dockerfile
+    container_name: soa-expense
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./soa-expense/.env
+    environment:
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+    restart: unless-stopped
+    networks:
+      - soa-network
+
+  soa-login:
+    build:
+      context: ./soa-login
+      dockerfile: Dockerfile
+    container_name: soa-login
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./soa-login/.env
+    environment:
+      - PORT=8001
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+      - EXPENSE_SERVICE_URL=http://soa-expense:8000
+    restart: unless-stopped
+    networks:
+      - soa-network
+    depends_on:
+      - soa-expense
+
+  soa-notification:
+    build:
+      context: ./soa-notification
+      dockerfile: Dockerfile
+    container_name: soa-notification
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./soa-notification/.env
+    environment:
+      - APP_PORT=3000
+      - AUTH_SERVICE_URL=http://soa-login:8001
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+    restart: unless-stopped
+    networks:
+      - soa-network
+    depends_on:
+      - soa-login
+
+networks:
+  soa-network:
+    driver: bridge
+

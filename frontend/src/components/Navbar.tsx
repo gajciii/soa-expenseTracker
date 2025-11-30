@@ -9,6 +9,7 @@ export const Navbar = () => {
   const { logout, isAuthenticated } = useAuth();
   const isExpenses = location.pathname === '/expenses';
   const isReports = location.pathname === '/reports';
+  const isNotifications = location.pathname === '/notifications';
 
   if (!isAuthenticated) {
     return null;
@@ -38,6 +39,13 @@ export const Navbar = () => {
               style={navbarStyles.link(isReports)}
             >
               Reports
+            </Link>
+            <Link
+              to="/notifications"
+              className={navbarClasses.link(isNotifications)}
+              style={navbarStyles.link(isNotifications)}
+            >
+              Notifications
             </Link>
           </div>
           <Button

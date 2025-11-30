@@ -29,3 +29,4 @@ export const expenseFormClasses = {
   buttonsContainer: 'flex justify-end gap-2 mt-6'
 };
 
+

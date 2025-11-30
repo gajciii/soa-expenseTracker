@@ -43,3 +43,4 @@ export const navbarClasses = {
   input: 'px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-palette-blue-grey focus:border-transparent transition-all flex-1 sm:flex-initial sm:w-auto min-w-0'
 };
 
+
