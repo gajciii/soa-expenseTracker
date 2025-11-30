@@ -150,3 +150,108 @@ export interface BudgetResponse {
   updated_at: string;
 }
 
+export interface MonthlyAnalyticsRow {
+  category_id: string;
+  category_name: string;
+  budget: number;
+  spent: number;
+}
+
+export interface MonthlyAnalyticsResponse {
+  monthly_id: string;
+  user_id: string;
+  month: string;
+  rows: MonthlyAnalyticsRow[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WeeklyAnalyticsDay {
+  date: string;
+  spent: number;
+}
+
+export interface WeeklyAnalyticsResponse {
+  weekly_id: string;
+  user_id: string;
+  type: string;
+  days: WeeklyAnalyticsDay[];
+  created_at: string;
+  updated_at: string;
+}
+
+export type SubscriptionInterval = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  name: string;
+  amount: number;
+  currency: string;
+  interval: SubscriptionInterval;
+  startDate: string;
+  nextRunAt: string;
+  lastRunAt: string | null;
+  notificationOffsetDays: number;
+  lastReminderAt: string | null;
+  isActive: boolean;
+  expenseCategoryId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSubscriptionRequest {
+  userId: string;
+  name: string;
+  amount: number;
+  currency: string;
+  interval: SubscriptionInterval;
+  startDate: string;
+  notificationOffsetDays?: number;
+  expenseCategoryId?: string;
+}
+
+export interface UpdateSubscriptionRequest {
+  name?: string;
+  amount?: number;
+  currency?: string;
+  interval?: SubscriptionInterval;
+  startDate?: string;
+  notificationOffsetDays?: number;
+  expenseCategoryId?: string;
+}
+
+export interface GroupExpenseRequest {
+  description: string;
+  payments: Record<string, number>;
+  totalAmount?: number;
+}
+
+export interface GroupExpenseResponse {
+  id: string;
+  description: string;
+  payments: Record<string, number>;
+  totalAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GroupRequest {
+  groupTitle: string;
+  groupMembers: string[];
+}
+
+export interface GroupResponse {
+  id: string;
+  groupTitle: string;
+  groupMembers: string[];
+}
+
+export interface MemberRequest {
+  memberId: string;
+}
+
+export interface GroupTitleRequest {
+  title: string;
+}
+

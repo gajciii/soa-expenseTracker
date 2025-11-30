@@ -45,7 +45,7 @@ export const ReportList = ({ reports, loading, onView, onDelete }: ReportListPro
                 <div 
                   key={index} 
                   className="p-3 sm:p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 transition-colors hover:opacity-80"
-                  style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-border)' }}
+                  style={{ backgroundColor: 'rgba(28, 15, 19, 0.1)', border: '1px solid var(--color-border)', backdropFilter: 'blur(10px)' }}
                 >
                   <span className="font-mono text-xs sm:text-sm break-all sm:break-normal" style={{ color: 'var(--color-text-primary)' }}>{reportId}</span>
                   <div className="flex gap-2 w-full sm:w-auto">

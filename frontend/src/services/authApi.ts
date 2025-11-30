@@ -24,6 +24,13 @@ export const authService = {
     const response = await authApi.get<User>(`/users/${userId}`);
     return response.data;
   },
+
+  getAllUsers: async (skip: number = 0, limit: number = 100): Promise<User[]> => {
+    const response = await authApi.get<User[]>('/users/', {
+      params: { skip, limit },
+    });
+    return response.data;
+  },
 };
 
 export default authService;

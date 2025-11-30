@@ -2,10 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ExpensesPage } from './pages/ExpensesPage';
-import { ReportsPage } from './pages/ReportsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { BudgetsPage } from './pages/BudgetsPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
+import { SubscriptionsPage } from './pages/SubscriptionsPage';
+import { SharedExpensesPage } from './pages/SharedExpensesPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -39,11 +41,7 @@ function App() {
                 />
                 <Route
                   path="/reports"
-                  element={
-                    <ProtectedRoute>
-                      <ReportsPage />
-                    </ProtectedRoute>
-                  }
+                  element={<Navigate to="/analytics" replace />}
                 />
                 <Route
                   path="/notifications"
@@ -66,6 +64,30 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <BudgetsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <AnalyticsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/subscriptions"
+                  element={
+                    <ProtectedRoute>
+                      <SubscriptionsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/shared-expenses"
+                  element={
+                    <ProtectedRoute>
+                      <SharedExpensesPage />
                     </ProtectedRoute>
                   }
                 />

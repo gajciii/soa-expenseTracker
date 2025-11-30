@@ -23,9 +23,9 @@ export const modalStyles = {
 };
 
 export const modalClasses = {
-  overlay: 'fixed inset-0 z-50 flex items-center justify-center p-4',
-  content: 'relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl',
-  header: 'sticky top-0 flex justify-between items-center p-4 sm:p-6 border-b',
+  overlay: 'fixed inset-0 z-[99999] flex items-center justify-center p-4',
+  content: 'relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl z-[100000]',
+  header: 'sticky top-0 flex justify-between items-center p-4 sm:p-6 border-b z-10',
   title: 'text-xl sm:text-2xl font-bold',
   closeButton: 'ml-auto text-xl sm:text-2xl font-bold leading-none hover:opacity-70 transition-opacity',
   body: 'p-4 sm:p-6'

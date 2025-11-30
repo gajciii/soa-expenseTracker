@@ -80,7 +80,7 @@ services:
       - ./soa-analytics/.env
     environment:
       - PORT=8003
-      - CATEGORY_BUDGET_URL=http://soa-category-budget:8002
+#      - CATEGORY_BUDGET_URL=http://soa-category-budget:8001
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
     restart: unless-stopped
     networks:
