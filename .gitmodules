@@ -4,3 +4,6 @@
 [submodule "soa-notification"]
 	path = soa-notification
 	url = https://github.com/anjalecnik/SOA_NotificationService.git
+[submodule "soa-category-budget"]
+	path = soa-category-budget
+	url = git@github.com:Tevc25/soa-category-budget.git
