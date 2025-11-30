@@ -50,3 +50,22 @@ Vsaka mikrostoritev je ločen GitHub repozitorij, ki ga v ta projekt dodamo kot 
    git commit -m "Dodana nova mikrostoritev: user-service"
    git push
    ```
+
+### 🔄 Posodabljanje submodula na najnovejšo verzijo
+
+Če želiš posodobiti submodule (npr. `soa-expense`), pojdi v njegovo mapo, potegni spremembe in posodobi pointer v glavnem repozitoriju:
+
+1. Potegni nove spremembe
+
+   ```bash
+   cd soa-expense
+   git pull origin main   # ali druga veja, če ne uporabljaš main
+   cd ..
+   ```
+
+2. Potrdiš spremembe:
+   ```bash
+   git add soa-expense
+   git commit -m "soa-expense submodule posoodbljen na najnovejšo verzijo"
+   git push
+   ```
