@@ -15,10 +15,10 @@ Private submoduli povzročijo napake pri kloniranju in inicializaciji.
 ### 🚀 Kloniranje repozitorija z vsemi mikrostoritvami
 
 1. Kloniraš glavni repo:
-    ```bash
-    git clone https://github.com/gajciii/soa-expenseTracker.git
-    cd soa-expenseTracker
-    ```
+   ```bash
+   git clone https://github.com/gajciii/soa-expenseTracker.git
+   cd soa-expenseTracker
+   ```
 2. Potegneš vse submodule:
    ```bash
    git submodule update --init --recursive
@@ -33,16 +33,20 @@ Private submoduli povzročijo napake pri kloniranju in inicializaciji.
    ```
 
 ### ➕ Dodajanje nove mikrostoritve (submodula)
-1. Dodaš submodule:
-   ```bash
-   git submodule add <URL> <pot/do/modula>
-   ```
+
+Vsaka mikrostoritev je ločen GitHub repozitorij, ki ga v ta projekt dodamo kot **submodule**.
+
+1. Dodaj submodule v root projekta
+   Submodule se doda v **koren projekta**, npr. kot map "soa-notification":
+
    Primer:
+
    ```bash
-   git submodule add git@github.com:mojorg/user-service.git services/user-service
-    ```
+   git submodule add <URL_DO_REPOZITORIJA> soa-notification
+   ```
+
 2. Potrdiš spremembe:
    ```bash
    git commit -m "Dodana nova mikrostoritev: user-service"
    git push
-    ```
+   ```
