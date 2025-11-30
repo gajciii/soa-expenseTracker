@@ -1,3 +1,6 @@
 [submodule "soa-expense"]
 	path = soa-expense
 	url = git@github.com:adam8kac/soa-expense.git
+[submodule "soa-notification"]
+	path = soa-notification
+	url = https://github.com/anjalecnik/SOA_NotificationService.git
