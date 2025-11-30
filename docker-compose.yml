@@ -110,6 +110,23 @@ services:
       - soa-login
       - soa-notification
 
+  soa-expense-shared:
+    build:
+      context: ./soa-shared-expenses
+      dockerfile: Dockerfile
+    container_name: soa-expense-shared
+    volumes:
+      - ./soa-shared-expenses/src/main/resources/firestore.json:/app/firestore.json:ro
+    ports:
+      - '8081:8080'
+    environment:
+      - PORT=8080
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/firestore.json
+    restart: unless-stopped
+    networks:
+      - soa-network
+
+
 networks:
   soa-network:
     driver: bridge

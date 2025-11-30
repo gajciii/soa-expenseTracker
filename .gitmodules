@@ -13,3 +13,6 @@
 [submodule "soa-analytics"]
 	path = soa-analytics
 	url = git@github.com:Tevc25/soa-analytics.git
+[submodule "soa-shared-expenses"]
+	path = soa-shared-expenses
+	url = git@github.com:adam8kac/soa-shared-expense.git
