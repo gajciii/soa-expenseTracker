@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: soa-expense
     ports:
-      - "8000:8000"
+      - '8000:8000'
     env_file:
       - ./soa-expense/.env
     environment:
@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: soa-login
     ports:
-      - "8001:8001"
+      - '8001:8001'
     env_file:
       - ./soa-login/.env
     environment:
@@ -39,7 +39,7 @@ services:
       dockerfile: Dockerfile
     container_name: soa-notification
     ports:
-      - "3001:3000"
+      - '3001:3000'
     env_file:
       - ./soa-notification/.env
     environment:
@@ -58,7 +58,7 @@ services:
       dockerfile: Dockerfile
     container_name: soa-category-budget
     ports:
-      - "8002:8001"
+      - '8002:8001'
     env_file:
       - ./soa-category-budget/.env
     environment:
@@ -69,7 +69,27 @@ services:
     depends_on:
       - soa-login
 
+  soa-subscription:
+    build:
+      context: ./soa-subscription
+      dockerfile: Dockerfile
+    container_name: soa-subscription
+    ports:
+      - '3005:3005'
+    env_file:
+      - ./soa-subscription/.env
+    environment:
+      - APP_PORT=3005
+      - EXPENSE_SERVICE_URL=http://soa-expense:8000
+      - NOTIFICATION_SERVICE_URL=http://soa-notification:3001
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+    restart: unless-stopped
+    networks:
+      - soa-network
+    depends_on:
+      - soa-login
+      - soa-notification
+
 networks:
   soa-network:
     driver: bridge
-
