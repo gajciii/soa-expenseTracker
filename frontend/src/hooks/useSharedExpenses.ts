@@ -6,6 +6,7 @@ import type {
   GroupRequest,
   GroupResponse,
   GroupTitleRequest,
+  MemberRequest,
 } from '../types';
 
 interface UseSharedExpensesReturn {
@@ -24,6 +25,8 @@ interface UseSharedExpensesReturn {
   deleteGroupExpense: (groupId: string, expenseId: string) => Promise<void>;
   updateGroupTitle: (id: string, title: string) => Promise<void>;
   deleteGroup: (id: string) => Promise<void>;
+  addMember: (groupId: string, memberData: MemberRequest) => Promise<void>;
+  addGroupExpense: (groupId: string, expenseData: GroupExpenseRequest) => Promise<void>;
 }
 
 export const useSharedExpenses = (userId: string | null | undefined): UseSharedExpensesReturn => {
@@ -173,6 +176,38 @@ export const useSharedExpenses = (userId: string | null | undefined): UseSharedE
     }
   }, [fetchUserGroups]);
 
+  const addMember = useCallback(async (groupId: string, memberData: MemberRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await sharedExpensesApi.addMember(groupId, memberData);
+      await fetchGroupMembers(groupId);
+      await fetchGroup(groupId);
+      await fetchUserGroups();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add member';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchGroupMembers, fetchGroup, fetchUserGroups]);
+
+  const addGroupExpense = useCallback(async (groupId: string, expenseData: GroupExpenseRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await sharedExpensesApi.addGroupExpense(groupId, expenseData);
+      await fetchGroupExpenses(groupId);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add group expense';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchGroupExpenses]);
+
   useEffect(() => {
     if (userId) {
       fetchUserGroups();
@@ -195,6 +230,8 @@ export const useSharedExpenses = (userId: string | null | undefined): UseSharedE
     deleteGroupExpense,
     updateGroupTitle,
     deleteGroup,
+    addMember,
+    addGroupExpense,
   };
 };
 

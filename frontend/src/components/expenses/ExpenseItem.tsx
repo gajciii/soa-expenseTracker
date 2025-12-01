@@ -1,10 +1,11 @@
 import { useState, Fragment } from 'react';
-import type { ExpenseResponse, Item } from '../../types';
+import type { ExpenseResponse, Item, GroupResponse } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../ui/Table';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { Modal } from '../ui/Modal';
 import { useNotification } from '../../contexts/NotificationContext';
 import { expenseItemStyles, expenseItemClasses } from '../../styles/expenseItemStyles';
 
@@ -13,14 +14,18 @@ interface ExpenseItemProps {
   onUpdateDescription: (expenseId: string, description: string) => Promise<void>;
   onUpdateItem: (expenseId: string, itemId: string, item: Item) => Promise<void>;
   onDelete: (expenseId: string) => Promise<void>;
+  onAddToSharedExpense?: (expense: ExpenseResponse, groupId: string) => Promise<void>;
+  groups?: GroupResponse[];
 }
 
-export const ExpenseItem = ({ expense, onUpdateDescription, onUpdateItem, onDelete }: ExpenseItemProps) => {
+export const ExpenseItem = ({ expense, onUpdateDescription, onUpdateItem, onDelete, onAddToSharedExpense, groups = [] }: ExpenseItemProps) => {
   const { showNotification } = useNotification();
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [editingDescription, setEditingDescription] = useState<string>('');
   const [editingItem, setEditingItem] = useState<{ expenseId: string; itemId: string; item: Item } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+  const [showAddToSharedModal, setShowAddToSharedModal] = useState<boolean>(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('');
 
   const startEditingDescription = (): void => {
     if (!expense.expense_id) return;
@@ -74,6 +79,19 @@ export const ExpenseItem = ({ expense, onUpdateDescription, onUpdateItem, onDele
     await onDelete(expense.expense_id);
   };
 
+  const handleAddToSharedExpense = async (): Promise<void> => {
+    if (!selectedGroupId || !onAddToSharedExpense) {
+      showNotification('Please select a group', 'warning');
+      return;
+    }
+    try {
+      await onAddToSharedExpense(expense, selectedGroupId);
+      setShowAddToSharedModal(false);
+      setSelectedGroupId('');
+    } catch (error) {
+    }
+  };
+
   return (
     <Card className={expenseItemClasses.container}>
       <div className={expenseItemClasses.headerContainer}>
@@ -103,6 +121,11 @@ export const ExpenseItem = ({ expense, onUpdateDescription, onUpdateItem, onDele
               <div className={expenseItemClasses.buttonsContainer}>
                 {expense.expense_id && (
                   <>
+                    {onAddToSharedExpense && groups.length > 0 && (
+                      <Button onClick={() => setShowAddToSharedModal(true)} variant="success" size="sm">
+                        Add to Shared
+                      </Button>
+                    )}
                     <Button onClick={startEditingDescription} variant="primary" size="sm">
                       Edit
                     </Button>
@@ -221,6 +244,68 @@ export const ExpenseItem = ({ expense, onUpdateDescription, onUpdateItem, onDele
         cancelText="Cancel"
         variant="danger"
       />
+      
+      <Modal
+        isOpen={showAddToSharedModal}
+        onClose={() => {
+          setShowAddToSharedModal(false);
+          setSelectedGroupId('');
+        }}
+        title="Add to Shared Expense"
+      >
+        <div className="space-y-4">
+          {groups.length === 0 ? (
+            <p style={{ color: 'var(--color-text-primary)' }}>
+              You don't have any groups. Please create a group first in Shared Expenses page.
+            </p>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Select Group
+                </label>
+                <select
+                  value={selectedGroupId}
+                  onChange={(e) => setSelectedGroupId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{
+                    backgroundColor: 'rgba(28, 15, 19, 0.1)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  <option value="">-- Select a group --</option>
+                  {groups.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.groupTitle}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  onClick={() => {
+                    setShowAddToSharedModal(false);
+                    setSelectedGroupId('');
+                  }}
+                  variant="secondary"
+                  size="md"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddToSharedExpense}
+                  variant="primary"
+                  size="md"
+                  disabled={!selectedGroupId}
+                >
+                  Add to Group
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </Card>
   );
 };

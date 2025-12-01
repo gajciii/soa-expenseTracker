@@ -8,7 +8,7 @@ import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { pageStyles, pageClasses } from '../styles/pageStyles';
-import type { GroupExpenseRequest, GroupRequest } from '../types';
+import type { GroupExpenseRequest, GroupRequest, MemberRequest } from '../types';
 
 export const SharedExpensesPage = () => {
   const { user } = useAuth();
@@ -29,10 +29,13 @@ export const SharedExpensesPage = () => {
     deleteGroupExpense,
     updateGroupTitle,
     deleteGroup,
+    addMember,
   } = useSharedExpenses(userId);
 
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [showAddMemberForm, setShowAddMemberForm] = useState<boolean>(false);
+  const [newMemberId, setNewMemberId] = useState<string>('');
 
   useEffect(() => {
     if (selectedGroupId) {
@@ -40,7 +43,6 @@ export const SharedExpensesPage = () => {
       fetchGroup(selectedGroupId);
       fetchGroupMembers(selectedGroupId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGroupId]);
 
   const handleSelectGroup = (groupId: string) => {
@@ -98,6 +100,21 @@ export const SharedExpensesPage = () => {
     }
   };
 
+  const handleAddMember = async () => {
+    if (!selectedGroupId || !newMemberId.trim()) {
+      showNotification('Please enter a member ID', 'warning');
+      return;
+    }
+    try {
+      await addMember(selectedGroupId, { memberId: newMemberId.trim() });
+      showNotification('Member added successfully!', 'success');
+      setNewMemberId('');
+      setShowAddMemberForm(false);
+    } catch (error) {
+      showNotification('Failed to add member', 'error');
+    }
+  };
+
   return (
     <div className={pageClasses.container}>
       <div className={pageClasses.header}>
@@ -140,12 +157,50 @@ export const SharedExpensesPage = () => {
             {selectedGroup && (
               <Card>
                 <div className="mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                    {selectedGroup.groupTitle}
-                  </h2>
-                  <div className="text-sm" style={{ color: 'var(--color-text-primary)', opacity: 0.7 }}>
-                    Members: {groupMembers.join(', ')}
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                        {selectedGroup.groupTitle}
+                      </h2>
+                      <div className="text-sm" style={{ color: 'var(--color-text-primary)', opacity: 0.7 }}>
+                        Members: {groupMembers.join(', ')}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setShowAddMemberForm(!showAddMemberForm)}
+                      variant={showAddMemberForm ? 'primary' : 'outline'}
+                      size="sm"
+                    >
+                      {showAddMemberForm ? 'Cancel' : 'Add Member'}
+                    </Button>
                   </div>
+                  
+                  {showAddMemberForm && (
+                    <div className="p-4 rounded-lg border mb-4" style={{ backgroundColor: 'rgba(28, 15, 19, 0.1)', borderColor: 'var(--color-border)' }}>
+                      <div className="flex gap-2 items-end">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                            Member ID
+                          </label>
+                          <input
+                            type="text"
+                            value={newMemberId}
+                            onChange={(e) => setNewMemberId(e.target.value)}
+                            placeholder="Enter user ID"
+                            className="w-full px-3 py-2 rounded-lg border"
+                            style={{
+                              backgroundColor: 'rgba(28, 15, 19, 0.1)',
+                              borderColor: 'var(--color-border)',
+                              color: 'var(--color-text-primary)',
+                            }}
+                          />
+                        </div>
+                        <Button onClick={handleAddMember} variant="primary" size="md" disabled={loading}>
+                          Add
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </Card>
             )}

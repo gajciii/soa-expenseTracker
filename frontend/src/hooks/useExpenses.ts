@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { expenseApi } from '../services/api';
 import type { ExpenseResponse, ExpenseRequest, Item, ExpenseParams } from '../types';
 
@@ -38,10 +38,12 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
   const [expenses, setExpenses] = useState<ExpenseResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const currentParamsRef = useRef<ExpenseParams>({});
 
   const fetchExpenses = useCallback(async (params: ExpenseParams = {}) => {
     if (!userId) return;
     
+    currentParamsRef.current = params;
     setLoading(true);
     setError(null);
     try {
@@ -80,7 +82,7 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
           saveExpenseIdMap(userId, expenseIdMap);
         }
       }
-      await fetchExpenses();
+      await fetchExpenses(currentParamsRef.current);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Napaka pri ustvarjanju expense-a';
@@ -107,7 +109,7 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
         }
       }
       saveExpenseIdMap(userId, expenseIdMap);
-      await fetchExpenses();
+      await fetchExpenses(currentParamsRef.current);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Napaka pri brisanju expense-a';
       setError(errorMessage);
@@ -125,7 +127,7 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
     setError(null);
     try {
       const result = await expenseApi.updateItem(userId, expenseId, itemId, itemData);
-      await fetchExpenses();
+      await fetchExpenses(currentParamsRef.current);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Napaka pri posodabljanju item-a';
@@ -145,7 +147,7 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
     try {
       await expenseApi.deleteAllExpenses(userId);
       localStorage.removeItem(`expense_ids_${userId}`);
-      await fetchExpenses();
+      await fetchExpenses(currentParamsRef.current);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Napaka pri brisanju vseh expense-ov';
       setError(errorMessage);
@@ -163,7 +165,7 @@ export const useExpenses = (userId: string | null | undefined): UseExpensesRetur
     setError(null);
     try {
       const result = await expenseApi.updateExpenseDescription(userId, expenseId, description);
-      await fetchExpenses();
+      await fetchExpenses(currentParamsRef.current);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Napaka pri posodabljanju opisa';

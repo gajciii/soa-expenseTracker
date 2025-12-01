@@ -61,6 +61,16 @@ export const sharedExpensesApi = {
     const response = await api.delete<{ message: string }>(`/groups/delete-group/${id}`);
     return response.data;
   },
+
+  addMember: async (groupId: string, memberData: MemberRequest): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>(`/groups/add-member/${groupId}`, memberData);
+    return response.data;
+  },
+
+  addGroupExpense: async (groupId: string, expenseData: GroupExpenseRequest): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>(`/group-expenses/add/${groupId}`, expenseData);
+    return response.data;
+  },
 };
 
 export default sharedExpensesApi;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ExpenseResponse, ExpenseParams, Item } from '../../types';
+import type { ExpenseResponse, ExpenseParams, Item, GroupResponse } from '../../types';
 import { ExpenseItem } from './ExpenseItem';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -16,6 +16,8 @@ interface ExpenseListProps {
   onUpdateItem: (expenseId: string, itemId: string, item: Item) => Promise<void>;
   onDelete: (expenseId: string) => Promise<void>;
   onDeleteAll: () => Promise<void>;
+  onAddToSharedExpense?: (expense: ExpenseResponse, groupId: string) => Promise<void>;
+  groups?: GroupResponse[];
 }
 
 export const ExpenseList = ({
@@ -27,6 +29,8 @@ export const ExpenseList = ({
   onUpdateItem,
   onDelete,
   onDeleteAll,
+  onAddToSharedExpense,
+  groups = [],
 }: ExpenseListProps) => {
   const { showNotification } = useNotification();
   const [dateFrom, setDateFrom] = useState<string>('');
@@ -124,6 +128,8 @@ export const ExpenseList = ({
                   onUpdateDescription={onUpdateDescription}
                   onUpdateItem={onUpdateItem}
                   onDelete={onDelete}
+                  onAddToSharedExpense={onAddToSharedExpense}
+                  groups={groups}
                 />
               ))}
             </div>

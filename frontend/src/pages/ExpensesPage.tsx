@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useExpenses } from '../hooks/useExpenses';
+import { useSharedExpenses } from '../hooks/useSharedExpenses';
 import { ExpenseForm } from '../components/expenses/ExpenseForm';
 import { ExpenseList } from '../components/expenses/ExpenseList';
 import { Button } from '../components/ui/Button';
-import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { pageStyles, pageClasses } from '../styles/pageStyles';
-import type { ExpenseRequest, ExpenseParams, Item } from '../types';
+import { useNotification } from '../contexts/NotificationContext';
+import type { ExpenseRequest, ExpenseParams, Item, ExpenseResponse, GroupExpenseRequest } from '../types';
 
 export const ExpensesPage = () => {
   const { user } = useAuth();
   const userId = user?.user_id || '';
-  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
   const { showNotification } = useNotification();
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [currentFilterParams, setCurrentFilterParams] = useState<ExpenseParams>({});
   const {
     expenses,
     loading,
@@ -24,72 +25,103 @@ export const ExpensesPage = () => {
     updateDescription,
     fetchExpenses,
   } = useExpenses(userId);
+  
+  const { groups, addGroupExpense, fetchUserGroups } = useSharedExpenses(userId);
+
+  useEffect(() => {
+    if (userId) {
+      fetchExpenses();
+    }
+  }, [userId, fetchExpenses]);
 
   const handleCreateExpense = async (expenseData: ExpenseRequest): Promise<void> => {
     try {
       await createExpense(expenseData);
+      await fetchExpenses(currentFilterParams);
       showNotification('Expense created successfully!', 'success');
+      setShowCreateForm(false);
     } catch (error) {
       console.error('Failed to create expense:', error);
-      showNotification('Failed to create expense. Check console for details.', 'error');
+      showNotification('Failed to create expense', 'error');
     }
   };
 
   const handleUpdateDescription = async (expenseId: string, description: string): Promise<void> => {
     try {
       await updateDescription(expenseId, description);
-      showNotification('Description updated successfully!', 'success');
+      alert('Description updated successfully!');
     } catch (error) {
       console.error('Failed to update description:', error);
-      showNotification('Failed to update description. Check console for details.', 'error');
+      alert('Failed to update description. Check console for details.');
     }
   };
 
   const handleUpdateItem = async (expenseId: string, itemId: string, item: Item): Promise<void> => {
     try {
       await updateItem(expenseId, itemId, item);
-      showNotification('Item updated successfully!', 'success');
+      alert('Item updated successfully!');
     } catch (error) {
       console.error('Failed to update item:', error);
-      showNotification('Failed to update item. Check console for details.', 'error');
+      alert('Failed to update item. Check console for details.');
     }
   };
 
   const handleDelete = async (expenseId: string): Promise<void> => {
     try {
       await deleteExpense(expenseId);
-      showNotification('Expense deleted successfully!', 'success');
+      alert('Expense deleted successfully!');
     } catch (error) {
       console.error('Failed to delete expense:', error);
-      showNotification('Failed to delete expense. Check console for details.', 'error');
+      alert('Failed to delete expense. Check console for details.');
     }
   };
 
   const handleDeleteAll = async (): Promise<void> => {
     try {
       await deleteAllExpenses();
-      showNotification('All expenses deleted successfully!', 'success');
+      alert('All expenses deleted successfully!');
     } catch (error) {
       console.error('Failed to delete all expenses:', error);
-      showNotification('Failed to delete all expenses. Check console for details.', 'error');
+      alert('Failed to delete all expenses. Check console for details.');
     }
   };
 
   const handleFilter = (params: ExpenseParams): void => {
+    setCurrentFilterParams(params);
     fetchExpenses(params);
   };
 
+  const handleAddToSharedExpense = async (expense: ExpenseResponse, groupId: string): Promise<void> => {
+    try {
+      const payments: Record<string, number> = {};
+      
+      payments[userId] = expense.total_price;
+      
+      const groupExpenseData: GroupExpenseRequest = {
+        description: expense.description,
+        payments: payments,
+      };
+      
+      await addGroupExpense(groupId, groupExpenseData);
+      await fetchUserGroups();
+      showNotification('Expense added to shared group successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to add expense to shared group:', error);
+      showNotification('Failed to add expense to shared group', 'error');
+    }
+  };
+
   return (
-    <div className={pageClasses.container}>
-      <div className={pageClasses.header}>
-        <h1 className={pageClasses.title} style={pageStyles.title}>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
           Your Ultimate Expense Management Solution
         </h1>
-        <p className={pageClasses.subtitle} style={pageStyles.subtitle}>
+        <p className="text-lg" style={{ color: 'var(--color-text-primary)' }}>
           Track and manage all your expenses in one unified platform
         </p>
       </div>
-      <div className={pageClasses.toggleContainer}>
+      <div className="flex items-center gap-4 mb-6">
         <Button
           onClick={() => setShowCreateForm(!showCreateForm)}
           variant={showCreateForm ? 'primary' : 'outline'}
@@ -99,7 +131,7 @@ export const ExpensesPage = () => {
         </Button>
       </div>
       {showCreateForm && (
-        <div className={pageClasses.formContainer}>
+        <div className="mb-8">
           <ExpenseForm onSubmit={handleCreateExpense} loading={loading} />
         </div>
       )}
@@ -112,6 +144,8 @@ export const ExpensesPage = () => {
         onUpdateItem={handleUpdateItem}
         onDelete={handleDelete}
         onDeleteAll={handleDeleteAll}
+        onAddToSharedExpense={handleAddToSharedExpense}
+        groups={groups}
       />
     </div>
   );
