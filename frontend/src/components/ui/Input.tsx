@@ -25,6 +25,8 @@ export const Input = ({ label, error, className = '', ...props }: InputProps) =>
           color: 'var(--color-text-primary)',
           ...(error ? { borderColor: 'var(--color-primary-dark)' } : {})
         }}
+        autoComplete={props.autoComplete || 'off'}
+        data-lpignore={props.type !== 'password' && props.type !== 'email' ? 'true' : undefined}
         {...props}
       />
       {error && (

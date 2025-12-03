@@ -12,7 +12,6 @@ export const Navbar = () => {
   
   const isExpenses = location.pathname === '/expenses';
   const isNotifications = location.pathname === '/notifications';
-  const isCategories = location.pathname === '/categories';
   const isBudgets = location.pathname === '/budgets';
   const isAnalytics = location.pathname === '/analytics';
   const isSubscriptions = location.pathname === '/subscriptions';
@@ -61,14 +60,6 @@ export const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Expenses
-            </Link>
-            <Link
-              to="/categories"
-              className={navbarClasses.link(isCategories)}
-              style={navbarStyles.link(isCategories)}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Categories
             </Link>
             <Link
               to="/budgets"

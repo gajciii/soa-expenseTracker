@@ -3,7 +3,6 @@ import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ExpensesPage } from './pages/ExpensesPage';
 import { NotificationsPage } from './pages/NotificationsPage';
-import { CategoriesPage } from './pages/CategoriesPage';
 import { BudgetsPage } from './pages/BudgetsPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SubscriptionsPage } from './pages/SubscriptionsPage';
@@ -48,14 +47,6 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <NotificationsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/categories"
-                  element={
-                    <ProtectedRoute>
-                      <CategoriesPage />
                     </ProtectedRoute>
                   }
                 />

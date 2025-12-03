@@ -2,7 +2,8 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir flask flask-cors supabase pydantic[email] python-dotenv requests
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 

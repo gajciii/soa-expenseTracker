@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Item, ExpenseRequest } from '../../types';
+import type { Item, ExpenseRequest, CategoryResponse } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -8,11 +8,13 @@ import { useNotification } from '../../contexts/NotificationContext';
 interface ExpenseFormProps {
   onSubmit: (expense: ExpenseRequest) => Promise<void>;
   loading: boolean;
+  categories?: CategoryResponse[];
 }
 
-export const ExpenseForm = ({ onSubmit, loading }: ExpenseFormProps) => {
+export const ExpenseForm = ({ onSubmit, loading, categories = [] }: ExpenseFormProps) => {
   const { showNotification } = useNotification();
   const [description, setDescription] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<string>('');
   const [items, setItems] = useState<Item[]>([
     { item_id: '', item_name: '', item_price: 0, item_quantity: 1 }
   ]);
@@ -67,11 +69,13 @@ export const ExpenseForm = ({ onSubmit, loading }: ExpenseFormProps) => {
         item_price: item.item_price,
         item_quantity: item.item_quantity,
       })),
+      category_id: categoryId || undefined,
     };
     
     await onSubmit(expenseData);
     
     setDescription('');
+    setCategoryId('');
     setItems([{ item_id: '', item_name: '', item_price: 0, item_quantity: 1 }]);
   };
 
@@ -88,6 +92,33 @@ export const ExpenseForm = ({ onSubmit, loading }: ExpenseFormProps) => {
           placeholder="Enter expense description"
           required
         />
+
+        {categories.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              Category (Optional)
+            </label>
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border"
+              autoComplete="off"
+              data-lpignore="true"
+              style={{
+                backgroundColor: 'rgba(28, 15, 19, 0.1)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              <option value="">-- No category --</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <div className="flex justify-between items-center mb-4">

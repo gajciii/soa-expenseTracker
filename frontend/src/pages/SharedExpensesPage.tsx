@@ -159,12 +159,12 @@ export const SharedExpensesPage = () => {
                 <div className="mb-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                        {selectedGroup.groupTitle}
-                      </h2>
-                      <div className="text-sm" style={{ color: 'var(--color-text-primary)', opacity: 0.7 }}>
-                        Members: {groupMembers.join(', ')}
-                      </div>
+                  <h2 className="text-xl sm:text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    {selectedGroup.groupTitle}
+                  </h2>
+                  <div className="text-sm" style={{ color: 'var(--color-text-primary)', opacity: 0.7 }}>
+                    Members: {groupMembers.join(', ')}
+                  </div>
                     </div>
                     <Button
                       onClick={() => setShowAddMemberForm(!showAddMemberForm)}

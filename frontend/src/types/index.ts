@@ -8,6 +8,7 @@ export interface Item {
 export interface ExpenseRequest {
   description?: string;
   items: Item[];
+  category_id?: string;
 }
 
 export interface ExpenseResponse {

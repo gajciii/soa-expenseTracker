@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useExpenses } from '../hooks/useExpenses';
 import { useSharedExpenses } from '../hooks/useSharedExpenses';
+import { useCategories } from '../hooks/useCategories';
 import { ExpenseForm } from '../components/expenses/ExpenseForm';
 import { ExpenseList } from '../components/expenses/ExpenseList';
+import { CategoryForm } from '../components/categories/CategoryForm';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
-import type { ExpenseRequest, ExpenseParams, Item, ExpenseResponse, GroupExpenseRequest } from '../types';
+import type { ExpenseRequest, ExpenseParams, Item, ExpenseResponse, GroupExpenseRequest, CategoryRequest } from '../types';
 
 export const ExpensesPage = () => {
   const { user } = useAuth();
@@ -27,12 +29,16 @@ export const ExpensesPage = () => {
   } = useExpenses(userId);
   
   const { groups, addGroupExpense, fetchUserGroups } = useSharedExpenses(userId);
+  const { categories, createCategory, fetchCategories, loading: categoriesLoading } = useCategories(userId);
+
+  const [showCreateCategoryForm, setShowCreateCategoryForm] = useState<boolean>(false);
 
   useEffect(() => {
     if (userId) {
       fetchExpenses();
+      fetchCategories();
     }
-  }, [userId, fetchExpenses]);
+  }, [userId, fetchExpenses, fetchCategories]);
 
   const handleCreateExpense = async (expenseData: ExpenseRequest): Promise<void> => {
     try {
@@ -49,40 +55,40 @@ export const ExpensesPage = () => {
   const handleUpdateDescription = async (expenseId: string, description: string): Promise<void> => {
     try {
       await updateDescription(expenseId, description);
-      alert('Description updated successfully!');
+      showNotification('Description updated successfully!', 'success');
     } catch (error) {
       console.error('Failed to update description:', error);
-      alert('Failed to update description. Check console for details.');
+      showNotification('Failed to update description', 'error');
     }
   };
 
   const handleUpdateItem = async (expenseId: string, itemId: string, item: Item): Promise<void> => {
     try {
       await updateItem(expenseId, itemId, item);
-      alert('Item updated successfully!');
+      showNotification('Item updated successfully!', 'success');
     } catch (error) {
       console.error('Failed to update item:', error);
-      alert('Failed to update item. Check console for details.');
+      showNotification('Failed to update item', 'error');
     }
   };
 
   const handleDelete = async (expenseId: string): Promise<void> => {
     try {
       await deleteExpense(expenseId);
-      alert('Expense deleted successfully!');
+      showNotification('Expense deleted successfully!', 'success');
     } catch (error) {
       console.error('Failed to delete expense:', error);
-      alert('Failed to delete expense. Check console for details.');
+      showNotification('Failed to delete expense', 'error');
     }
   };
 
   const handleDeleteAll = async (): Promise<void> => {
     try {
       await deleteAllExpenses();
-      alert('All expenses deleted successfully!');
+      showNotification('All expenses deleted successfully!', 'success');
     } catch (error) {
       console.error('Failed to delete all expenses:', error);
-      alert('Failed to delete all expenses. Check console for details.');
+      showNotification('Failed to delete all expenses', 'error');
     }
   };
 
@@ -111,6 +117,17 @@ export const ExpensesPage = () => {
     }
   };
 
+  const handleCreateCategory = async (categoryData: CategoryRequest): Promise<void> => {
+    try {
+      await createCategory(categoryData);
+      showNotification('Category created successfully!', 'success');
+      setShowCreateCategoryForm(false);
+    } catch (error) {
+      console.error('Failed to create category:', error);
+      showNotification('Failed to create category', 'error');
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -129,10 +146,22 @@ export const ExpensesPage = () => {
         >
           {showCreateForm ? 'Hide Create Form' : 'Create New Expense'}
         </Button>
+        <Button
+          onClick={() => setShowCreateCategoryForm(!showCreateCategoryForm)}
+          variant={showCreateCategoryForm ? 'primary' : 'outline'}
+          size="md"
+        >
+          {showCreateCategoryForm ? 'Hide Create Category' : 'Create New Category'}
+        </Button>
       </div>
+      {showCreateCategoryForm && (
+        <div className="mb-8">
+          <CategoryForm onSubmit={handleCreateCategory} loading={categoriesLoading} />
+        </div>
+      )}
       {showCreateForm && (
         <div className="mb-8">
-          <ExpenseForm onSubmit={handleCreateExpense} loading={loading} />
+          <ExpenseForm onSubmit={handleCreateExpense} loading={loading} categories={categories} />
         </div>
       )}
       <ExpenseList

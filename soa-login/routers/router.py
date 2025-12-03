@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 from services.user_service import UserService
+from services.token_service import TokenService
 from models.user_model import UserCreate, UserUpdate, UserLogin
 import uuid
 
 router = Blueprint("users", __name__, url_prefix="/users")
 user_service = UserService()
+token_service = TokenService()
 
 
 def validate_uuid(user_id: str) -> bool:
@@ -45,10 +47,52 @@ def login_user():
         if not user:
             return jsonify({"error": "Invalid username or password"}), 401
 
-        return jsonify(user.model_dump()), 200
+        try:
+            access_token = token_service.create_access_token(user.user_id, user.username)
+            refresh_token = token_service.create_refresh_token(user.user_id, user.username)
+            
+            if not access_token or not refresh_token:
+                print(f"ERROR: Failed to generate tokens for user {user.user_id}")
+                return jsonify({"error": "Failed to generate authentication tokens"}), 500
+        except Exception as token_error:
+            print(f"ERROR: Token generation failed: {str(token_error)}")
+            return jsonify({"error": f"Token generation failed: {str(token_error)}"}), 500
+
+        response_data = {
+            "user": user.model_dump(),
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "Bearer"
+        }
+        
+        print(f"Login successful for user {user.user_id}, tokens generated")
+        return jsonify(response_data), 200
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        print(f"ERROR: Login failed: {str(e)}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+
+@router.route("/refresh", methods=["POST"])
+def refresh_token():
+    try:
+        data = request.get_json()
+        if not data or "refresh_token" not in data:
+            return jsonify({"error": "refresh_token is required"}), 400
+
+        refresh_token = data["refresh_token"]
+        new_access_token = token_service.refresh_access_token(refresh_token)
+
+        if not new_access_token:
+            return jsonify({"error": "Invalid or expired refresh token"}), 401
+
+        return jsonify({
+            "access_token": new_access_token,
+            "token_type": "Bearer"
+        }), 200
+
     except Exception as e:
         return jsonify({"error": f"Internal server error: {str(e)}"}), 500
 

@@ -9,9 +9,29 @@ const authApi: AxiosInstance = axios.create({
   },
 });
 
+export interface LoginResponse {
+  user: User;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
 export const authService = {
-  login: async (credentials: LoginRequest): Promise<User> => {
-    const response = await authApi.post<User>('/users/login', credentials);
+  login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+    const response = await authApi.post<LoginResponse>('/users/login', credentials);
+    console.log('Auth API response:', response.data);
+    return response.data;
+  },
+
+  refreshToken: async (refreshToken: string): Promise<RefreshTokenResponse> => {
+    const response = await authApi.post<RefreshTokenResponse>('/users/refresh', {
+      refresh_token: refreshToken,
+    });
     return response.data;
   },
 
