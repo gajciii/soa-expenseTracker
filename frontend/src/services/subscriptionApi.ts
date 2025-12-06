@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { SUBSCRIPTION_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   Subscription,
   CreateSubscriptionRequest,
@@ -12,6 +13,9 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(api);
 
 export const subscriptionApi = {
   getUserSubscriptions: async (userId: string): Promise<Subscription[]> => {

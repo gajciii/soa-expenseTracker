@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { ANALYTICS_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   MonthlyAnalyticsResponse,
   WeeklyAnalyticsResponse,
@@ -11,6 +12,9 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(api);
 
 export const analyticsApi = {
   getMonthly: async (userId: string, month: string): Promise<MonthlyAnalyticsResponse> => {

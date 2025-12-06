@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   Item,
   ExpenseRequest,
@@ -16,6 +17,9 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(api);
 
 export const expenseApi = {
   getExpenses: async (userId: string, params: ExpenseParams = {}): Promise<ExpenseResponse[]> => {

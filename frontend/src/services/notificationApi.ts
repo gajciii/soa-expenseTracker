@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { NOTIFICATION_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   Reminder,
   CreateReminderRequest,
@@ -15,6 +16,9 @@ const notificationApi: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(notificationApi);
 
 export const reminderApi = {
   createReminder: async (data: CreateReminderRequest): Promise<Reminder> => {

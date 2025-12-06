@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { CATEGORY_BUDGET_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   CategoryRequest,
   CategoryResponse,
@@ -14,6 +15,9 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(api);
 
 export const categoryBudgetApi = {
   createCategory: async (userId: string, categoryData: CategoryRequest): Promise<CreateCategoryResponse> => {

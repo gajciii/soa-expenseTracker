@@ -1,14 +1,17 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { getCookie, setCookie, deleteCookie } from './cookies';
 import { authService } from '../services/authApi';
 
-const setupAxiosInterceptor = () => {
-  axios.interceptors.request.use(
+// Helper funkcija za dodajanje interceptorjev na axios instanco
+export const addInterceptors = (axiosInstance: AxiosInstance) => {
+  // Request interceptor - dodaj Bearer token
+  axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const isPublicEndpoint = config.url?.includes('/users/login') || 
-                               config.url?.includes('/users/register') || 
-                               config.url?.includes('/users/refresh');
-      
+      const isPublicEndpoint =
+        config.url?.includes('/users/login') ||
+        config.url?.includes('/users/register') ||
+        config.url?.includes('/users/refresh');
+
       if (!isPublicEndpoint) {
         const accessToken = getCookie('access_token');
         if (accessToken && config.headers) {
@@ -22,7 +25,8 @@ const setupAxiosInterceptor = () => {
     }
   );
 
-  axios.interceptors.response.use(
+  // Response interceptor - refresh token če je potreben
+  axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
@@ -40,7 +44,7 @@ const setupAxiosInterceptor = () => {
               originalRequest.headers.Authorization = `Bearer ${response.access_token}`;
             }
 
-            return axios(originalRequest);
+            return axiosInstance(originalRequest);
           } catch (refreshError) {
             deleteCookie('access_token');
             deleteCookie('refresh_token');
@@ -60,5 +64,9 @@ const setupAxiosInterceptor = () => {
   );
 };
 
-export default setupAxiosInterceptor;
+const setupAxiosInterceptor = () => {
+  // Dodaj interceptorje na globalno axios instanco
+  addInterceptors(axios);
+};
 
+export default setupAxiosInterceptor;

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { SHARED_EXPENSES_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type {
   GroupExpenseRequest,
   GroupExpenseResponse,
@@ -15,6 +16,9 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+addInterceptors(api);
 
 export const sharedExpensesApi = {
   createGroup: async (groupData: GroupRequest): Promise<{ message: string }> => {

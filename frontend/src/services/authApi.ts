@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { LOGIN_API_BASE_URL } from '../config/api';
+import { addInterceptors } from '../utils/axiosInterceptor';
 import type { User, LoginRequest, RegisterRequest } from '../types';
 
 const authApi: AxiosInstance = axios.create({
@@ -8,6 +9,10 @@ const authApi: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Dodaj interceptorje za avtomatsko dodajanje Bearer tokena
+// (public endpoint-i kot /users/login, /users/register, /users/refresh bodo avtomatsko preskočeni)
+addInterceptors(authApi);
 
 export interface LoginResponse {
   user: User;
