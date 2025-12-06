@@ -1,6 +1,6 @@
 import jwt
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 
 class TokenService:
@@ -11,22 +11,26 @@ class TokenService:
         self.algorithm = "HS256"
 
     def create_access_token(self, user_id: str, username: str) -> str:
+        now = datetime.now(timezone.utc)
+        exp = now + timedelta(minutes=self.access_token_expire_minutes)
         payload = {
             "sub": user_id,
             "username": username,
             "type": "access",
-            "exp": datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes),
-            "iat": datetime.utcnow()
+            "exp": int(exp.timestamp()),
+            "iat": int(now.timestamp())
         }
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
 
     def create_refresh_token(self, user_id: str, username: str) -> str:
+        now = datetime.now(timezone.utc)
+        exp = now + timedelta(days=self.refresh_token_expire_days)
         payload = {
             "sub": user_id,
             "username": username,
             "type": "refresh",
-            "exp": datetime.utcnow() + timedelta(days=self.refresh_token_expire_days),
-            "iat": datetime.utcnow()
+            "exp": int(exp.timestamp()),
+            "iat": int(now.timestamp())
         }
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
 
