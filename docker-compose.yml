@@ -23,6 +23,13 @@ services:
       - ./soa-expense/.env
     environment:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
     restart: unless-stopped
     networks:
       - soa-network
@@ -159,6 +166,13 @@ services:
     environment:
       - PORT=8080
       - GOOGLE_APPLICATION_CREDENTIALS=/app/firestore.json
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
     restart: unless-stopped
     networks:
       - soa-network
