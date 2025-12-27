@@ -1,4 +1,17 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-guest}
+    restart: unless-stopped
+    networks:
+      - soa-network
+
   soa-expense:
     build:
       context: ./soa-expense
@@ -27,11 +40,19 @@ services:
       - PORT=8001
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
       - EXPENSE_SERVICE_URL=http://soa-expense:8000
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
     restart: unless-stopped
     networks:
       - soa-network
     depends_on:
       - soa-expense
+      - rabbitmq
 
   soa-notification:
     build:
@@ -62,12 +83,20 @@ services:
     env_file:
       - ./soa-category-budget/.env
     environment:
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:8080}
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
     restart: unless-stopped
     networks:
       - soa-network
     depends_on:
       - soa-login
+      - rabbitmq
 
   soa-analytics:
     build:
@@ -81,13 +110,21 @@ services:
     environment:
       - PORT=8003
       - CATEGORY_BUDGET_URL=http://soa-category-budget:8001
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:8080}
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
     restart: unless-stopped
     networks:
       - soa-network
     depends_on:
       - soa-category-budget
       - soa-login
+      - rabbitmq
 
   soa-subscription:
     build:
@@ -125,6 +162,29 @@ services:
     restart: unless-stopped
     networks:
       - soa-network
+
+  soa-logs:
+    build:
+      context: ./soa-logs
+      dockerfile: Dockerfile
+    container_name: soa-logs
+    ports:
+      - '8010:8010'
+    environment:
+      - LOG_DB_PATH=/app/logs.db
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE:-logs-exchange}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-logs-queue}
+      - RABBITMQ_ROUTING_KEY=${RABBITMQ_ROUTING_KEY:-logs.route}
+      - APP_PORT=8010
+    restart: unless-stopped
+    networks:
+      - soa-network
+    depends_on:
+      - rabbitmq
 
 
 networks:

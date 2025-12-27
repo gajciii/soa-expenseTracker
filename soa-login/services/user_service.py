@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import secrets
 from datetime import datetime
 from typing import Optional, List
@@ -6,10 +7,12 @@ from db.supabase import get_db
 from models.user_model import UserCreate, UserUpdate, UserResponse
 import requests
 import os
+from logging_utils import get_correlation_id, get_logger
 
 
 class UserService:
     def __init__(self):
+        self.logger = get_logger() or logging.getLogger("soa-login")
         self.db = get_db()
         self.expense_service_url = os.getenv("EXPENSE_SERVICE_URL", "http://localhost:8000")
 
@@ -50,15 +53,36 @@ class UserService:
         
         user_id = result.data[0]["id"]
 
+        headers = {}
+        cid = get_correlation_id()
+        if cid:
+            headers["X-Correlation-Id"] = cid
         try:
             requests.post(
                 f"{self.expense_service_url}/users/{user_id}/initialize",
                 json={"user_id": user_id, "username": user_data.username},
+                headers=headers,
                 timeout=2,
             )
-        except requests.RequestException:
-            pass
+        except requests.RequestException as exc:
+            self.logger.warning(
+                "Failed to initialize expense profile",
+                extra={
+                    "correlation_id": cid,
+                    "url": f"{self.expense_service_url}/users/{user_id}/initialize",
+                    "method": "POST",
+                    "detail": str(exc),
+                },
+            )
 
+        self.logger.info(
+            "User created",
+            extra={
+                "correlation_id": get_correlation_id(),
+                "path": "/users/register",
+                "detail": f"user_id={user_id}",
+            },
+        )
         return str(user_id)
 
     def get_user_by_id(self, user_id: str) -> Optional[UserResponse]:
@@ -158,7 +182,7 @@ class UserService:
         if isinstance(updated_at, str):
             updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
 
-        return UserResponse(
+        user = UserResponse(
             user_id=str(user_doc["id"]),
             username=user_doc["username"],
             email=user_doc["email"],
@@ -168,6 +192,15 @@ class UserService:
             updated_at=updated_at,
             is_active=user_doc.get("is_active", True),
         )
+        self.logger.info(
+            "User login success",
+            extra={
+                "correlation_id": get_correlation_id(),
+                "path": "/users/login",
+                "detail": f"user_id={user.user_id}",
+            },
+        )
+        return user
 
     def update_user(self, user_id: str, user_data: UserUpdate) -> dict:
         try:
@@ -199,6 +232,14 @@ class UserService:
                 update_data["password"] = self._hash_password(user_data.password)
 
             self.db.table("users").update(update_data).eq("id", user_id).execute()
+            self.logger.info(
+                "User updated",
+                extra={
+                    "correlation_id": get_correlation_id(),
+                    "path": f"/users/{user_id}",
+                    "detail": ",".join(update_data.keys()),
+                },
+            )
             return {"message": "User updated successfully"}
 
         except Exception as e:
@@ -216,6 +257,14 @@ class UserService:
                 "is_active": is_active,
                 "updated_at": datetime.now().isoformat()
             }).eq("id", user_id).execute()
+            self.logger.info(
+                "User status updated",
+                extra={
+                    "correlation_id": get_correlation_id(),
+                    "path": f"/users/{user_id}/status",
+                    "detail": f"is_active={is_active}",
+                },
+            )
             
             return {"message": f"User status updated to {'active' if is_active else 'inactive'}"}
 
@@ -232,13 +281,35 @@ class UserService:
 
             self.db.table("users").delete().eq("id", user_id).execute()
 
+            headers = {}
+            cid = get_correlation_id()
+            if cid:
+                headers["X-Correlation-Id"] = cid
             try:
                 requests.delete(
                     f"{self.expense_service_url}/users/{user_id}/expenses/expense/delete-all",
+                    headers=headers,
                     timeout=2,
                 )
-            except requests.RequestException:
-                pass
+            except requests.RequestException as exc:
+                self.logger.warning(
+                    "Failed to cleanup expenses on user delete",
+                    extra={
+                        "correlation_id": cid,
+                        "url": f"{self.expense_service_url}/users/{user_id}/expenses/expense/delete-all",
+                        "method": "DELETE",
+                        "detail": str(exc),
+                    },
+                )
+
+            self.logger.info(
+                "User deleted",
+                extra={
+                    "correlation_id": get_correlation_id(),
+                    "path": f"/users/{user_id}",
+                    "detail": "deleted",
+                },
+            )
 
             return {"message": "User deleted successfully"}
 
@@ -254,5 +325,13 @@ class UserService:
         if count > 0:
             for user in all_users.data:
                 self.db.table("users").delete().eq("id", user["id"]).execute()
+        self.logger.info(
+            "All users deleted",
+            extra={
+                "correlation_id": get_correlation_id(),
+                "path": "/users",
+                "detail": f"count={count}",
+            },
+        )
         
         return {"message": f"Deleted {count} users successfully"}
